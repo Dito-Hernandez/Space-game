@@ -12,6 +12,7 @@ import javafx.scene.image.*;
 
 import java.io.*;
 
+
 import java.util.*;
 import java.text.*;
 import java.io.*;
@@ -36,15 +37,31 @@ public class Main extends Application
    FlowPane fp;
    
    Canvas theCanvas = new Canvas(600,600);
+   
+   Player thePlayer = new Player(300,300);
+   
+   boolean heldUp;
+   boolean heldLeft;
+   boolean heldDown;
+   boolean heldRight;
+   boolean xClicked;
+   boolean yClicked;
+   
 
    public void start(Stage stage)
    {
       
    
       fp = new FlowPane();
-      fp.getChildren().add(theCanvas);
+      
       gc = theCanvas.getGraphicsContext2D();
       drawBackground(300,300,gc);
+      
+      thePlayer.drawMe(300,300,gc);
+      fp.getChildren().add(theCanvas);
+
+      theCanvas.setOnKeyPressed(new KeyListenerDown());
+      theCanvas.setOnKeyReleased(new KeyListenerUp());
       
       
       Scene scene = new Scene(fp, 600, 600);
@@ -52,6 +69,11 @@ public class Main extends Application
       stage.setTitle("Project :)");
       stage.show();
       
+      theCanvas.requestFocus();
+
+       AnimationHandler ta = new AnimationHandler();
+       ta.start();
+
       
    }
    
@@ -103,11 +125,6 @@ public class Main extends Application
          }
       }
    }
-   
-   
-   
-   
-   
 
    
    public class AnimationHandler extends AnimationTimer
@@ -116,19 +133,74 @@ public class Main extends Application
       {
          gc.clearRect(0,0,600,600);
          
-         //USE THIS CALL ONCE YOU HAVE A PLAYER
-         //drawBackground(thePlayer.getX(),thePlayer.getY(),gc); 
+         drawBackground(thePlayer.getX(),thePlayer.getY(),gc); 
+
+         thePlayer.act(xClicked,yClicked,heldUp, heldLeft, heldDown,heldRight,  gc);
 
 
 	      //example calls of draw - this should be the player's call for draw
-         //thePlayer.draw(300,300,gc,true); //all other objects will use false in the parameter.
+         thePlayer.draw(300,300,gc,true); //all other objects will use false in the parameter.
 
          //example call of a draw where m is a non-player object. Note that you are passing the player's position in and not m's position.
          //m.draw(thePlayer.getX(),thePlayer.getY(),gc,false);
          
       }
    }
-
+   public class KeyListenerDown implements EventHandler<KeyEvent>  
+   {
+      public void handle(KeyEvent event) 
+      {
+          if (event.getCode() == KeyCode.W) 
+          {
+            heldUp = true;
+            yClicked = true;
+          }
+          if (event.getCode() == KeyCode.S) 
+          {
+            heldDown = true;
+            yClicked = true;
+          }
+          if (event.getCode() == KeyCode.A)
+          {
+            heldLeft = true;
+            xClicked = true;
+          }
+          if (event.getCode() == KeyCode.D) 
+          {
+            heldRight = true;
+            xClicked = true;
+          }
+      }
+    }
+    public class KeyListenerUp implements EventHandler<KeyEvent>  
+    {
+      public void handle(KeyEvent event) 
+      {
+          
+          if (event.getCode() == KeyCode.W) 
+          {
+            heldUp = false;
+            yClicked = false;
+          }
+          else if (event.getCode() == KeyCode.S) 
+          {
+            heldDown = false;
+            yClicked = false;
+          }
+          if (event.getCode() == KeyCode.A)
+          {
+            heldLeft = false;
+            xClicked=false;
+          }
+          else if (event.getCode() == KeyCode.D) 
+          {
+            heldRight = false;
+            xClicked=false;
+          }
+      }
+      
+   }
+   
    public static void main(String[] args)
    {
       launch(args);
