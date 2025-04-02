@@ -40,12 +40,18 @@ public class Main extends Application
    
    Player thePlayer = new Player(300,300);
    
+   Player orgin = new Player(300,300);
+   
    boolean heldUp;
    boolean heldLeft;
    boolean heldDown;
    boolean heldRight;
    boolean xClicked;
    boolean yClicked;
+   
+   int distance = 0; 
+   
+   static int highest = 0;
    
 
    public void start(Stage stage)
@@ -59,6 +65,7 @@ public class Main extends Application
       
       thePlayer.drawMe(300,300,gc);
       fp.getChildren().add(theCanvas);
+      
 
       theCanvas.setOnKeyPressed(new KeyListenerDown());
       theCanvas.setOnKeyReleased(new KeyListenerUp());
@@ -80,7 +87,7 @@ public class Main extends Application
    GraphicsContext gc;
    
    
-   
+
    Image background = new Image("stars.png");
    Image overlay = new Image("starsoverlay.png");
    Random backgroundRand = new Random();
@@ -124,6 +131,13 @@ public class Main extends Application
             gc.drawImage(overlay,-playerx+i*400,-playery+j*400);
          }
       }
+      
+      gc.setFill(new Color(1,1,1,1));
+      gc.setFont(new Font(15));
+      gc.fillText("Distance: "+distance, 10,30);
+      gc.fillText("Best: "+highest, 10,60);
+
+
    }
 
    
@@ -136,6 +150,11 @@ public class Main extends Application
          drawBackground(thePlayer.getX(),thePlayer.getY(),gc); 
 
          thePlayer.act(xClicked,yClicked,heldUp, heldLeft, heldDown,heldRight,  gc);
+         distance = (int)thePlayer.distance(orgin);
+         if(highest<distance){
+            highest = distance;
+         }
+         
 
 
 	      //example calls of draw - this should be the player's call for draw
