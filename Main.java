@@ -42,6 +42,10 @@ public class Main extends Application
    
    Player orgin = new Player(300,300);
    
+   Mine tester = new Mine(500,500);
+   
+
+   
    boolean heldUp;
    boolean heldLeft;
    boolean heldDown;
@@ -53,6 +57,14 @@ public class Main extends Application
    
    static int highest = 0;
    
+   Random rand = new Random();
+   
+   ArrayList<Mine> list = new ArrayList<Mine>();
+   
+   int lastgridx = 0;
+   int lastgridy = 0;
+
+   
 
    public void start(Stage stage)
    {
@@ -62,9 +74,9 @@ public class Main extends Application
       
       gc = theCanvas.getGraphicsContext2D();
       drawBackground(300,300,gc);
-      
-      thePlayer.drawMe(300,300,gc);
+
       fp.getChildren().add(theCanvas);
+      
       
 
       theCanvas.setOnKeyPressed(new KeyListenerDown());
@@ -78,8 +90,8 @@ public class Main extends Application
       
       theCanvas.requestFocus();
 
-       AnimationHandler ta = new AnimationHandler();
-       ta.start();
+      AnimationHandler ta = new AnimationHandler();
+      ta.start();
 
       
    }
@@ -139,8 +151,72 @@ public class Main extends Application
 
 
    }
-
    
+   public void minefield(int posx,int posy){
+       float ranX = rand.nextFloat() * 100;
+       float ranY = rand.nextFloat() * 100;
+       float random = rand.nextFloat();
+       
+      if(random<.3){
+       Mine temp = new Mine(posx*100+ranX,posy*100+ranY);
+       list.add(temp);}
+
+         
+        
+   }  
+   public void gridCheck(int cgridx,int cgridy){
+
+      int posX = cgridx;
+      int posY= cgridy;
+      for(int i=0;i<10;i++){
+         posX = ((cgridx-5)) + (i);
+         posY = cgridy-5;
+         int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
+         if(distance!=0){
+            for(int j=1;j<distance+1;j++){
+               minefield(posX,posY);
+            }
+         }
+      }
+      for(int i=0;i<10;i++){
+         posX = ((cgridx-5)) + (i);
+         posY = cgridy+4;
+         int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
+         if(distance!=0){
+            for(int j=1;j<distance+1;j++){
+               minefield(posX,posY);
+            }
+         }
+
+      }
+      for(int i=0;i<10;i++){
+         posX = (cgridx-5);
+         posY = (cgridy-5) + (i);
+         int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
+         if(distance!=0){
+            for(int j=1;j<distance+1;j++){
+               minefield(posX,posY);
+            }
+         }
+
+      }
+      for(int i=0;i<10;i++){
+         posX = (cgridx+4);
+         posY = (cgridy-5) + (i);
+         int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
+         if(distance!=0){
+            for(int j=1;j<distance+1;j++){
+               minefield(posX,posY);
+            }
+         }
+
+      }
+
+
+
+   }   
+   
+   boolean check = false;
    public class AnimationHandler extends AnimationTimer
    {
       public void handle(long currentTimeInNanoSeconds) 
@@ -149,19 +225,37 @@ public class Main extends Application
          
          drawBackground(thePlayer.getX(),thePlayer.getY(),gc); 
 
-         thePlayer.act(xClicked,yClicked,heldUp, heldLeft, heldDown,heldRight,  gc);
+         thePlayer.act(xClicked,yClicked,heldUp, heldLeft, heldDown,heldRight, gc);
          distance = (int)thePlayer.distance(orgin);
          if(highest<distance){
             highest = distance;
          }
+
+
+         int cgridx = ((int)thePlayer.getX())/100;
+         int cgridy = ((int)thePlayer.getY())/100;
          
+         if((cgridx != lastgridx) || (cgridy != lastgridy)){
+            gridCheck(cgridx,cgridy);}
+         
+         for(int i = 0;i<list.size();i++){
+            list.get(i).shadeChanger();
+            list.get(i).draw(thePlayer.getX(),thePlayer.getY(),gc,false);
+            int dis = (int)thePlayer.distance(list.get(i));
+            if(dis>800){
+               list.remove(list.get(i));
+            }
+         }
+
 
 
 	      //example calls of draw - this should be the player's call for draw
          thePlayer.draw(300,300,gc,true); //all other objects will use false in the parameter.
-
+         //min.draw(350,350,gc,false);
          //example call of a draw where m is a non-player object. Note that you are passing the player's position in and not m's position.
-         //m.draw(thePlayer.getX(),thePlayer.getY(),gc,false);
+         
+         lastgridx = cgridx;
+         lastgridy = cgridy;
          
       }
    }
