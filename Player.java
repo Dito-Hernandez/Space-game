@@ -66,4 +66,9 @@ public class Player extends DrawableObject
        setX(getX()+xForce);
        setY(getY()+yForce);
    }
+   public void death(){
+      yForce = 0;
+      xForce = 0;
+   }
+   
 }
