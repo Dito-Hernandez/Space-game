@@ -31,14 +31,14 @@ public class Main extends Application
    
    Canvas theCanvas = new Canvas(600,600);
    
+   //player object
    Player thePlayer = new Player(300,300);
    
+   //orgin object
    Player orgin = new Player(300,300);
-   
-   Mine tester = new Mine(500,500);
-   
+      
 
-   
+   //booleans to keep track of what is being clicked
    boolean heldUp;
    boolean heldLeft;
    boolean heldDown;
@@ -46,17 +46,21 @@ public class Main extends Application
    boolean xClicked;
    boolean yClicked;
    
+   //holders for the currents distance, the highscore, and the previous highscore
    int distance = 0; 
    static int highest = 0;
    static int lastHighest = 0;
    
    Random rand = new Random();
    
+   //array of all mines created
    ArrayList<Mine> list = new ArrayList<Mine>();
    
+   //keeps track of the previous grid
    int lastgridx = 0;
    int lastgridy = 0;
    
+   //keeps track if the player hasnt touched a mine
    boolean NotDead = true;
 
    public void start(Stage stage)
@@ -70,11 +74,9 @@ public class Main extends Application
 
       fp.getChildren().add(theCanvas);
       
-      
-      if(NotDead){
          theCanvas.setOnKeyPressed(new KeyListenerDown());
          theCanvas.setOnKeyReleased(new KeyListenerUp());
-      }
+      
       
       Scene scene = new Scene(fp, 600, 600);
       stage.setScene(scene);
@@ -145,6 +147,7 @@ public class Main extends Application
 
    }
    
+   //method that creates a mine in a random position of the grid. There is a 30% chance that a mine will be created
    public void minefield(int posx,int posy){
        float ranX = rand.nextFloat() * 100;
        float ranY = rand.nextFloat() * 100;
@@ -152,18 +155,18 @@ public class Main extends Application
        
       if(random<.3){
        Mine temp = new Mine(posx*100+ranX,posy*100+ranY);
-       list.add(temp);}
-
-         
-        
+       list.add(temp);}  
    }  
+   //creates mines in the grids surrounding the player
    public void gridCheck(int cgridx,int cgridy){
 
       int posX = cgridx;
       int posY= cgridy;
+      //for the ten grids above the player, it will create mines in each one
       for(int i=0;i<10;i++){
          posX = ((cgridx-5)) + (i);
          posY = cgridy-5;
+         //depending on how far away the mine is from the origin, it will create that many amount if mines
          int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
          if(distance!=0){
             for(int j=1;j<distance+1;j++){
@@ -171,31 +174,35 @@ public class Main extends Application
             }
          }
       }
+      //for the ten grids below the player, it will create mines in each one
       for(int i=0;i<10;i++){
          posX = ((cgridx-5)) + (i);
          posY = cgridy+4;
+         //depending on how far away the mine is from the origin, it will create that many amount if mines
          int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
          if(distance!=0){
             for(int j=1;j<distance+1;j++){
                minefield(posX,posY);
             }
          }
-
       }
+      //for the ten grids to the left the player, it will create mines in each one
       for(int i=0;i<10;i++){
          posX = (cgridx-5);
          posY = (cgridy-5) + (i);
+         //depending on how far away the mine is from the origin, it will create that many amount if mines
          int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
          if(distance!=0){
             for(int j=1;j<distance+1;j++){
                minefield(posX,posY);
             }
          }
-
       }
+      //for the ten grids to the right the player, it will create mines in each one
       for(int i=0;i<10;i++){
          posX = (cgridx+4);
          posY = (cgridy-5) + (i);
+         //depending on how far away the mine is from the origin, it will create that many amount if mines
          int distance = (int)(Math.sqrt((posX*100-300)*(posX*100-300) +  (posY*100-300)*(posY*100-300))/1000);
          if(distance!=0){
             for(int j=1;j<distance+1;j++){
@@ -214,9 +221,10 @@ public class Main extends Application
    {
       public void handle(long currentTimeInNanoSeconds) 
       {
+         //draws the background
          gc.clearRect(0,0,600,600);
-         
          drawBackground(thePlayer.getX(),thePlayer.getY(),gc); 
+         //if the player is alive, then it will call the act method for the player wich allows it to move, if the player is dead, it will call the death method of player
          if(NotDead){
             thePlayer.act(xClicked,yClicked,heldUp, heldLeft, heldDown,heldRight, gc);
          }
@@ -224,22 +232,26 @@ public class Main extends Application
             thePlayer.death();
 
          }
+         //gets the distance of the player between the origin, and if the distance is higher than the highscore, it will make it the highscore
          distance = (int)thePlayer.distance(orgin);
          if(highest<distance){
             highest = distance;
             lastHighest = highest;
          }
 
-
+         //gets the current grid that the player is in
          int cgridx = ((int)thePlayer.getX())/100;
          int cgridy = ((int)thePlayer.getY())/100;
          
+         //if the player changes grids, then the gridCheck method is called
          if((cgridx != lastgridx) || (cgridy != lastgridy)){
             gridCheck(cgridx,cgridy);}
          
+         //for each mine in the mine array, the shadeChanger method is called so it can cycle between colors, znd the mine is drawn
          for(int i = 0;i<list.size();i++){
             list.get(i).shadeChanger();
             list.get(i).draw(thePlayer.getX(),thePlayer.getY(),gc,false);
+            //if the mine is father than 800 from the player, then the mine is removed, if the mine is closer than 20, then its removed and the player is dead
             int dis = (int)thePlayer.distance(list.get(i));
             if(dis>800){
                list.remove(list.get(i));
@@ -251,14 +263,19 @@ public class Main extends Application
          }
 
 
-
-	      //example calls of draw - this should be the player's call for draw
+         //example calls of draw - this should be the player's call for draw
+         
+         
+         //if the playe is not dead, then player is drawn
          if(NotDead){
             thePlayer.draw(300,300,gc,true);
-         } //all other objects will use false in the parameter.
+         } 
+         
+         //all other objects will use false in the parameter.
          //min.draw(350,350,gc,false);
          //example call of a draw where m is a non-player object. Note that you are passing the player's position in and not m's position.
          
+         //the previous grid the player was at is stored 
          lastgridx = cgridx;
          lastgridy = cgridy;
          
@@ -268,6 +285,7 @@ public class Main extends Application
    {
       public void handle(KeyEvent event) 
       {
+          // if the player is not dead, then if w,a,s,d is pressed, then its recorded
           if(NotDead){
              if (event.getCode() == KeyCode.W) 
              {
@@ -296,7 +314,7 @@ public class Main extends Application
     {
       public void handle(KeyEvent event) 
       {
-          
+          //if a,w,s,d is lifted up, then it is recorded
           if (event.getCode() == KeyCode.W) 
           {
             heldUp = false;
@@ -323,6 +341,7 @@ public class Main extends Application
    static boolean start = false;
    public static void main(String[] args)
    {
+           //attemps to read the file highScore and get the highscore recorded in there, if highscore dosent exist, then start is true
            try{
                Scanner readList = new Scanner(new File("highScrore.txt"));
                lastHighest = readList.nextInt();
@@ -331,11 +350,15 @@ public class Main extends Application
             catch(FileNotFoundException fnfe){
                start = true;
             }
+      //allows methods of application run
       launch(args);
       
+      //if start, the lasthighest is the current highest
       if(start){
          lastHighest = highest;
       }
+      //Creates or edits a file called highScore, if start is true, then it puts the lasthighest in, then makes false. If not, then if highest is greater 
+      //than lasthighest, then it writes highest. If not any of those then lasthighest is printed.
       try{ 
          FileOutputStream fos = new FileOutputStream("highScrore.txt",false);
          PrintWriter pw = new PrintWriter(fos);

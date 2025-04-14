@@ -19,9 +19,11 @@ public class Mine extends DrawableObject
    {
       gc.setFill(new Color(1,1,1,1));
       gc.fillOval(x-7,y-7,14,14);
+      //color values green and blue are effected by the value of shade wich is effected by shadeChanger
       gc.setFill(new Color(1,1*shade,1*shade,1));
       gc.fillOval(x-6,y-6,12,12);
    }
+   //shadChanger method takes in the tick from animation handler, and decreaes chade value until below 0, where itll loop back to 1 and start again
    public void shadeChanger(){
       shade-=.01;
       if(shade<=0){
